@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload Portfolio</title>
+</head>
+<body>
+    <h1>Upload Portfolio</h1>
+    <form method="post">
+        {% csrf_token %}
+        <h2>Intern Information</h2>
+        {{ intern_form.as_p }}
+        
+        <h2>Portfolio Details</h2>
+        {{ portfolio_form.as_p }}
+        
+        <button type="submit">Upload and Analyze</button>
+    </form>
+</body>
+</html>

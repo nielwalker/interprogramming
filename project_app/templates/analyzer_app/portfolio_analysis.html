@@ -1,0 +1,64 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Portfolio Analysis</title>
+    <!-- Add Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-light">
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Analysis for Portfolio: {{ portfolio.title }}</h1>
+
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h2>Original Description</h2>
+            </div>
+            <div class="card-body">
+                <p>{{ portfolio.description }}</p>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+                <h2>Summary</h2>
+            </div>
+            <div class="card-body">
+                <p>{{ rating.summary }}</p>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h2>Analysis Scores</h2>
+            </div>
+            <div class="card-body">
+                <p><strong>Relatedness Score:</strong> {{ rating.relatedness_score }}</p>
+                <p><strong>Technical Skills Mentioned:</strong> {{ rating.technical_skills_score }}</p>
+                <p><strong>Communication Skills Mentioned:</strong> {{ rating.communication_skills_score }}</p>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header bg-warning text-white">
+                <h2>Skills Breakdown</h2>
+            </div>
+            <div class="card-body">
+                <div style="width: 100%; max-width: 600px; height: 400px; margin: auto;">
+                    <canvas id="skillsChart"></canvas>
+                </div>
+                <div id="graphs-data" style="display: none;">{{ graphs_data|safe }}</div>
+            </div>
+        </div>
+
+        <div class="text-center">
+            <a href="{% url 'portfolio_list'%}" class="btn btn-secondary">Back to Portfolios</a>
+        </div>
+    </div>
+
+    <!-- Add Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'analyzer_app/js/portfolio_analysis_chart.js' %}"></script>
+</body>
+</html>
