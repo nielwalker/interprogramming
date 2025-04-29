@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1>Weekly Report Overview</h1>
+    {% if reports %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Week</th>
+                    <th>Submission Date</th>
+                    <th>Report File</th>
+                    <th>Date and No. of Hours</th>
+                    <th>Activities/Tasks (Success Indicator)</th>
+                    <th>Score: Accomplished Targets</th>
+                    <th>New Learnings (example: technical, interpersonal)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for report in reports %}
+                    <tr>
+                        <td>{{ report.week_number }}</td>
+                        <td>{{ report.submission_date }}</td>
+                        <td><a href="{{ report.report_file.url }}" target="_blank">View Report</a></td>
+                        <td>{{ report.date_and_hours }}</td>
+                        <td>{{ report.activities_tasks|linebreaksbr }}</td>
+                        <td>{{ report.score_accomplished_targets }}</td>
+                        <td>{{ report.new_learnings|linebreaksbr }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No reports have been uploaded yet.</p>
+    {% endif %}
+    <br>
+    <a href="{% url 'student_dashboard' %}">Back to Dashboard</a>
+{% endblock %}

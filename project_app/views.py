@@ -5,20 +5,29 @@ from heapq import nlargest
 import nltk
 from django.db import models
 from django.shortcuts import render, get_object_or_404 , redirect
-from .models import Portfolio, Rating , Intern # Import the Rating model from models.py
+from .models import Portfolio, Rating , Intern ,WeeklyReport# Imweeport the Rating model from models.py
 import json
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from django.contrib.auth import logout
-from django.contrib.auth import logout
 from django.shortcuts import redirect
-
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from .forms import UploadReportForm
+from django.utils import timezone
+from datetime import timedelta
 
 
 
 nltk.download('stopwords')
 nltk.download('punkt')
 nltk.download('punkt_tab')
+
+
+@login_required
+def student_dashboard(request):
+    return render(request, 'analyzer_app/student_dashboard.html')
 
 def analyze_portfolio(portfolio):
     try:
@@ -120,10 +129,10 @@ def intern_login_view(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return redirect('portfolio_list')  # Redirect to the portfolio list or dashboard
+            return redirect('student_dashboard')  # Redirect to the portfolio list or dashboard
         else:
             messages.error(request, 'Invalid username or password.')
-    return render(request, 'analyzer_app/inter_login.html')
+    return render(request, 'analyzer_app/intern_login.html')
 
 
 def upload_portfolio_view(request):
@@ -146,3 +155,39 @@ def upload_portfolio_view(request):
             return render(request, 'analyzer_app/upload_portfolio_form.html', {'error': 'Please fill in all required fields.', 'interns': interns})
     else:
         return render(request, 'analyzer_app/upload_portfolio_form.html', {'interns': interns})
+    
+
+
+def overview_reports(request):
+    reports = WeeklyReport.objects.filter(student=request.user).order_by('week_number')
+    context = {'reports': reports}
+    return render(request, 'overview_reports.html', context)
+
+
+def upload_report(request, week_number):
+    today = timezone.now().date()
+    # Assuming the week starts on a Monday. Adjust as needed.
+    start_of_week = today - timedelta(days=today.weekday())
+    upload_deadline = start_of_week + timedelta(days=5)  # 5 days to upload
+
+    if today > upload_deadline:
+        messages.error(request, f"The upload deadline for Week {week_number} has passed.")
+        return redirect('student_dashboard')  # Redirect to the dashboard or an appropriate page
+
+    try:
+        existing_report = WeeklyReport.objects.get(student=request.user, week_number=week_number)
+        # If a report exists, you might want to handle editing or display a message
+        messages.info(request, f"You have already uploaded a report for Week {week_number}.")
+        form = UploadReportForm(instance=existing_report) # Populate form for potential editing
+    except WeeklyReport.DoesNotExist:
+        if request.method == 'POST':
+            form = UploadReportForm(request.POST, request.FILES, week_number=week_number, student=request.user)
+            if form.is_valid():
+                form.save()
+                messages.success(request, f"Report for Week {week_number} uploaded successfully!")
+                return redirect('student_dashboard')
+        else:
+            form = UploadReportForm(week_number=week_number, student=request.user)
+
+    context = {'form': form, 'week_number': week_number}
+    return render(request, 'upload_report.html', context)

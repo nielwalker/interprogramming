@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align content at the top */
+            height: 100vh; /* Full viewport height */
+            overflow: hidden; /* Prevent scrolling outside the body */
+        }
+
+        .container {
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            background-color: #ffffff;
+            display: grid;
+            grid-template-rows: auto 1fr; /* Header and content */
+            gap: 20px;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            margin: 0;
+            padding: 0;
+            text-align: left;
+            color: #3498db;
+        }
+
+        .parent {
+            display: grid;
+            grid-template-columns: 1fr 3fr; /* Sidebar and main content */
+            grid-template-rows: 1fr; /* Single row */
+            gap: 20px;
+            height: 100%; /* Fill remaining space */
+        }
+
+        .div1, .div2 {
+            border-radius: 8px;
+        }
+
+        .div1 {
+            background-color: #F1F2F7;
+            color: white;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        .div2 {
+            background-color: #F1F2F7;
+            color: #333;
+            padding: 20px;
+            border-radius: 8px;
+            display: flex; /* Use flexbox */
+            flex-direction: column; /* Stack items vertically */
+            justify-content: center; /* Center items vertically */
+            align-items: center; /* Center items horizontally */
+        }
+
+        .nav-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .nav-button {
+            padding: 12px 15px;
+            background-color: #6072E5;
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: center;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        .nav-button:hover {
+            background-color: #4b00b3;
+        }
+
+        .week-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 26px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .week-tab {
+            padding: 10px 15px;
+            background-color: #eee;
+            color: #333;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .week-tab:hover {
+            background-color: #ccc;
+        }
+
+        .week-tab.active {
+            background-color: #6072E5;
+            color: white;
+            border-color: #6072E5;
+        }
+
+        #report-form {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 0;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        #report-form th, #report-form td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        #report-form th {
+            background-color: #f0f0f0;
+            color: #2c3e50;
+        }
+
+        #report-form input[type="text"],
+        #report-form textarea {
+            width: 100%;
+            height: 120px;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            resize: none;
+            transition: border-color 0.3s ease;
+        }
+
+        #report-form input[type="text"]:focus,
+        #report-form textarea:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        #submit-button {
+            background-color: #6072E5;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+            align-self: flex-end;
+        }
+
+        #submit-button:hover {
+            background-color: #27ae60;
+        }
+
+        .form-container {
+            width: 100%;
+            height: 100%; /* Ensure it fills the parent container */
+            display: flex; /* Use flexbox */
+            flex-direction: column; /* Stack items vertically */
+            justify-content: center; /* Center items vertically */
+            align-items: center; /* Center items horizontally */
+            overflow: hidden; /* Prevent scrolling */
+        }
+
+        #upload-journal-form {
+            display: flex;
+            flex-direction: column; /* Stack form elements vertically */
+            gap: 15px; /* Add spacing between form elements */
+            align-items: center; /* Center form elements horizontally */
+        }
+
+        #upload-button {
+            background-color: #6072E5;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        #upload-button:hover {
+            background-color: #4b00b3;
+        }
+
+        .form-container form {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        @media (max-width: 768px) {
+            .parent {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto;
+            }
+
+            .div1, .div2 {
+                height: auto;
+            }
+
+            .week-tabs {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Student Dashboard</h1>
+        <div class="parent">
+            <div class="div1">
+                <div class="nav-buttons">
+                    <button class="nav-button" data-action="upload-journal">Upload Journal</button>
+                    <button class="nav-button" data-action="add-week-report">Add Week Report</button>
+                    <button class="nav-button" data-action="overview">Overview</button>
+                </div>
+            </div>
+            <div class="div2" >
+                <div class="week-tabs">
+                </div>
+                <div class="form-container">
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        const weekTabsContainer = document.querySelector('.week-tabs');
+        const formContainer = document.querySelector('.form-container');
+        const navButtons = document.querySelectorAll('.nav-button');
+
+        const weekData = [
+            { id: 'week1', label: 'Week 1' },
+            { id: 'week2', label: 'Week 2' },
+            { id: 'week3', label: 'Week 3' },
+            { id: 'week4', label: 'Week 4' },
+            { id: 'week5', label: 'Week 5' },
+            { id: 'week6', label: 'Week 6' },
+            { id: 'week7', label: 'Week 7' },
+            { id: 'week8', label: 'Week 8' },
+            { id: 'week9', label: 'Week 9' },
+            { id: 'week10', label: 'Week 10' },
+            { id: 'week11', label: 'Week 11' },
+            { id: 'week12', label: 'Week 12' },
+        ];
+
+        function createWeekTabs() {
+            weekTabsContainer.innerHTML = ''; // Clear existing tabs
+            weekData.forEach(week => {
+                const tab = document.createElement('a');
+                tab.href = `#${week.id}`;
+                tab.classList.add('week-tab');
+                tab.textContent = week.label;
+                tab.addEventListener('click', () => showWeekReport(week.id));
+                weekTabsContainer.appendChild(tab);
+            });
+        }
+
+        function showWeekReport(weekId) {
+            formContainer.innerHTML = ''; // Clear existing forms
+            const form = document.createElement('form');
+            form.id = weekId;
+            form.classList.add('report-section');
+            form.action = '#'; // Keep the action within the page
+            form.method = 'post';
+
+            const table = document.createElement('table');
+            table.id = 'report-form';
+            table.innerHTML = `
+                <thead>
+                    <tr>
+                        <th>Date and No. of Hours</th>
+                        <th>Activities/Tasks (Success Indicator)</th>
+                        <th>Score: Accomplished/Targets</th>
+                        <th>New Learnings (example: technical, interpersonal)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="text" name="date_hours"></td>
+                        <td><textarea name="activities"></textarea></td>
+                        <td><input type="text" name="score"></td>
+                        <td><textarea name="learnings"></textarea></td>
+                    </tr>
+                </tbody>
+            `;
+
+            const submitButton = document.createElement('button');
+            submitButton.id = 'submit-button';
+            submitButton.type = 'submit';
+            submitButton.textContent = 'Submit';
+
+            form.appendChild(table);
+            form.appendChild(submitButton);
+            formContainer.appendChild(form);
+
+            // Set active tab
+            document.querySelectorAll('.week-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelector(`a[href="#${weekId}"]`).classList.add('active');
+        }
+
+        function handleNavClick(action) {
+            formContainer.innerHTML = ''; // Clear form container
+            weekTabsContainer.innerHTML = ''; // Clear week tabs
+
+            if (action === 'add-week-report') {
+                createWeekTabs();
+                // Show the first week report by default
+                if (weekData.length > 0) {
+                    showWeekReport(weekData[0].id);
+                }
+            } else if (action === 'upload-journal') {
+                formContainer.innerHTML = `
+                    <h3>Upload Journal Section</h3>
+                    <p>Please upload your journal in PDF format:</p>
+                    <form id="upload-journal-form">
+                        <input type="file" id="journal-file" name="journal-file" accept="application/pdf" />
+                        <button type="submit" id="upload-button">Upload</button>
+                    </form>
+                `;
+
+                // Add event listener for the upload form
+                const uploadForm = document.getElementById('upload-journal-form');
+                uploadForm.addEventListener('submit', (event) => {
+                    event.preventDefault(); // Prevent the default form submission
+                    const fileInput = document.getElementById('journal-file');
+                    const file = fileInput.files[0];
+                    if (file) {
+                        alert(`File "${file.name}" uploaded successfully!`);
+                        // You can add further logic here to handle the file upload
+                    } else {
+                        alert('Please select a PDF file to upload.');
+                    }
+                });
+            } else if (action === 'overview') {
+                formContainer.innerHTML = '<h3>Overview Section</h3><p>This section will display the overview.</p>';
+            }
+        }
+
+        // Event Listeners for Navigation Buttons
+        navButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const action = button.dataset.action;
+                handleNavClick(action);
+            });
+        });
+
+        // Initialize -  Show "Add Week Report" section on initial load
+        handleNavClick('add-week-report');
+    </script>
+</body>
+</html>
+``` 

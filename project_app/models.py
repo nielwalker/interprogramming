@@ -1,4 +1,24 @@
 from django.db import models
+from django.contrib.auth.models import User
+
+
+
+class WeeklyReport(models.Model):
+    student = models.ForeignKey(User, on_delete=models.CASCADE)
+    week_number = models.IntegerField()
+    submission_date = models.DateField(auto_now_add=True)
+    report_file = models.FileField(upload_to='reports/')  # Stores the PDF file
+    date_and_hours = models.CharField(max_length=255, blank=True, null=True)
+    activities_tasks = models.TextField(blank=True, null=True)
+    score_accomplished_targets = models.CharField(max_length=255, blank=True, null=True)
+    new_learnings = models.TextField(blank=True, null=True)
+
+    class Meta:
+        unique_together = ('student', 'week_number')  # Ensure only one report per student per week
+
+    def __str__(self):
+        return f"Report for Week {self.week_number} - {self.student.username}"
+
 
 class Intern(models.Model):
     name = models.CharField(max_length=255)
