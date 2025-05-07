@@ -14,9 +14,12 @@ from django.shortcuts import redirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .forms import UploadReportForm
+from .forms import UploadReportForm, WeekReportForm
 from django.utils import timezone
 from datetime import timedelta
+from django.http import HttpResponse, JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from .models import WeekReport
 
 
 
@@ -191,3 +194,54 @@ def upload_report(request, week_number):
 
     context = {'form': form, 'week_number': week_number}
     return render(request, 'upload_report.html', context)
+
+
+@csrf_exempt
+def add_week_report(request):
+    if request.method == 'POST':
+        week = request.POST.get('week')
+        date = request.POST.get('date')
+        hours = request.POST.get('hours')
+        activities = request.POST.get('activities')
+        score = request.POST.get('score')
+        learnings = request.POST.get('learnings')
+        if all([week, date, hours, activities, score, learnings]):
+            WeekReport.objects.create(
+                week=week,
+                date=date,
+                hours=hours,
+                activities=activities,
+                score=score,
+                learnings=learnings
+            )
+            return JsonResponse({'message': 'Saved!'})
+        return JsonResponse({'error': 'Missing fields'}, status=400)
+    return JsonResponse({'error': 'Invalid method'}, status=405)
+
+
+@csrf_exempt
+def update_week_report(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        try:
+            report = WeekReport.objects.get(id=data['id'])
+            report.date = data['date']
+            report.hours = data['hours']
+            report.activities = data['activities']
+            report.score = data['score']
+            report.learnings = data['learnings']
+            report.save()
+            return JsonResponse({'message': 'Updated!'})
+        except WeekReport.DoesNotExist:
+            return JsonResponse({'error': 'Report not found'}, status=404)
+    return JsonResponse({'error': 'Invalid method'}, status=405)
+
+
+def success(request):
+    return HttpResponse("Week report submitted successfully!")
+
+
+def get_week_reports(request):
+    if request.method == 'GET':
+        reports = WeekReport.objects.all().values('id', 'week', 'date', 'hours', 'activities', 'score', 'learnings')
+        return JsonResponse(list(reports), safe=False)

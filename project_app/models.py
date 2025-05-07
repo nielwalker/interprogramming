@@ -48,3 +48,15 @@ class Rating(models.Model):
 
     def __str__(self):
         return f"Rating for {self.portfolio}"
+
+
+class WeekReport(models.Model):
+    week = models.CharField(max_length=50)  # Week identifier (e.g., "Week 1")
+    date = models.DateField()  # Date of the report
+    hours = models.PositiveIntegerField()  # Number of hours
+    activities = models.TextField()  # Activities/Tasks
+    score = models.CharField(max_length=50)  # Score
+    learnings = models.TextField()  # New Learnings
+
+    def __str__(self):
+        return f"{self.week} - {self.date}"

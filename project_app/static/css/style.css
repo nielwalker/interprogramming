@@ -64,24 +64,37 @@ h1 {
 .nav-buttons {
     display: flex;
     flex-direction: column;
+    height: 100%;
+    justify-content: flex-start;
     gap: 10px;
+    position: relative;
     width: 100%;
 }
 
-.nav-button {
-    padding: 12px 15px;
+.nav-button{
     background-color: #6072E5;
-    color: #ffffff;
+}
+.nav-button,
+.logout-button {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px 0;
+    font-size: 1em;
+    border-radius: 4px;
     border: none;
-    border-radius: 6px;
     cursor: pointer;
-    text-align: center;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
+    transition: background 0.2s;
 }
 
-.nav-button:hover {
-    background-color: #4b00b3;
+.logout-button {
+    margin-top: auto;
+    background-color: #e74c3c;
+    color: #fff;
+    width: 100%;
+}
+
+.logout-button:hover {
+    background-color: #c0392b;
 }
 
 .week-tabs {
@@ -113,10 +126,33 @@ h1 {
     border-color: #6072E5;
 }
 
+.week-dropdown {
+    display: flex;
+    flex-direction: column; /* Stack label and dropdown vertically */
+    align-items: center; /* Center align the label and dropdown */
+    margin-bottom: 20px; /* Add spacing below the dropdown */
+}
+
+.week-label {
+    font-size: 16px;
+    margin-bottom: 10px; /* Add spacing between the label and dropdown */
+    color: #333;
+}
+
+.week-select {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    width: 200px;
+    cursor: pointer;
+}
+
 #report-form {
     border-collapse: collapse;
-    width: 100%;
-    margin-bottom: 0;
+    width: calc(100% ); /* Match the parent width with a margin of 20px on each side */
+    max-width: 100%; /* Ensure it doesn't exceed the parent's width */
+    margin: 20px auto; /* Center the table and add vertical spacing */
     background-color: white;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
@@ -125,12 +161,52 @@ h1 {
 #report-form th, #report-form td {
     border: 1px solid #ddd;
     padding: 12px;
-    text-align: left;
+    text-align: center;
 }
 
 #report-form th {
     background-color: #f0f0f0;
     color: #2c3e50;
+}
+
+#report-form th:nth-child(1), #report-form td:nth-child(1) {
+    width: 15%; /* Set the width for the "Date" column */
+}
+
+#report-form th:nth-child(2), #report-form td:nth-child(2) {
+    width: 5%; /* Set the width for the "No. of Hours" column */
+}
+
+#report-form th:nth-child(3), #report-form td:nth-child(3) {
+    width: 30%; /* Set the width for the "Activities/Tasks" column */
+}
+
+#report-form th:nth-child(4), #report-form td:nth-child(4) {
+    width: 15%; /* Set the width for the "Score" column */
+}
+
+#report-form th:nth-child(5), #report-form td:nth-child(5) {
+    width: 30%; /* Set the width for the "New Learnings" column */
+}
+
+#report-form tbody td:nth-child(1) {
+    width: 15%; /* Set the width for the "Date" column */
+}
+
+#report-form tbody td:nth-child(2) {
+    width: 5%; /* Set the width for the "No. of Hours" column */
+}
+
+#report-form tbody td:nth-child(3) {
+    width: 30%; /* Set the width for the "Activities/Tasks" column */
+}
+
+#report-form tbody td:nth-child(4) {
+    width: 15%; /* Set the width for the "Score" column */
+}
+
+#report-form tbody td:nth-child(5) {
+    width: 50%; /* Set the width for the "New Learnings" column */
 }
 
 #report-form input[type="text"],
@@ -153,6 +229,11 @@ h1 {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
+#report-form tbody {
+    display: table-row-group; /* Ensure proper table row grouping */
+    width: 100%; /* Make the tbody span the full width of the table */
+}
+
 #submit-button {
     background-color: #6072E5;
     color: white;
@@ -171,12 +252,12 @@ h1 {
 }
 
 .form-container {
+    display: flex;
+    flex-direction: column; /* Stack elements vertically */
+    align-items: center; /* Center align all elements */
+    justify-content: flex-start; /* Align elements at the top */
     width: 100%;
-    height: 100%; /* Ensure it fills the parent container */
-    display: flex; /* Use flexbox */
-    flex-direction: column; /* Stack items vertically */
-    justify-content: center; /* Center items vertically */
-    align-items: center; /* Center items horizontally */
+    height: 100%;
     overflow: hidden; /* Prevent scrolling */
 }
 
@@ -206,6 +287,65 @@ h1 {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
+}
+
+#overview-table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 20px auto;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+#overview-table th, #overview-table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: center;
+}
+
+#overview-table th {
+    background-color: #f0f0f0;
+    color: #2c3e50;
+}
+
+.overview-table {
+    border-collapse: collapse;
+    width: 98%;
+    margin: 20px auto;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    table-layout: auto; /* Let columns grow with content */
+}
+
+.overview-table th, .overview-table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: center;
+    vertical-align: top; /* Align content to the top for multi-line text */
+    word-break: break-word;
+}
+
+.overview-table input,
+.overview-table textarea {
+    width: 95%;
+    box-sizing: border-box;
+    resize: none;
+    font-family: inherit;
+    font-size: 1em;
+    padding: 6px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    background: #fafbfc;
+}
+
+.overview-table textarea {
+    min-height: 40px;
+    /* Remove max-height to allow expansion */
+    max-height: none;
+    height: auto;
+    overflow-y: auto;
 }
 
 @media (max-width: 768px) {

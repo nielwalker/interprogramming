@@ -1,5 +1,5 @@
 from django import forms
-from .models import Intern, Portfolio ,WeeklyReport
+from .models import Intern, Portfolio, WeeklyReport, WeekReport
 
 class InternForm(forms.ModelForm):
     class Meta:
@@ -29,3 +29,15 @@ class UploadReportForm(forms.ModelForm):
         if commit:
             instance.save()
         return instance
+
+
+class WeekReportForm(forms.ModelForm):
+    class Meta:
+        model = WeekReport
+        fields = ['week', 'date', 'hours', 'activities', 'score', 'learnings']
+        widgets = {
+            'date': forms.DateInput(attrs={'type': 'date'}),
+            'hours': forms.NumberInput(attrs={'min': 0}),
+            'activities': forms.Textarea(attrs={'rows': 3}),
+            'learnings': forms.Textarea(attrs={'rows': 3}),
+        }
