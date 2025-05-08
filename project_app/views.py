@@ -20,7 +20,7 @@ from datetime import timedelta
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import WeekReport
-
+from django.contrib.auth.models import User
 
 
 nltk.download('stopwords')
@@ -245,3 +245,48 @@ def get_week_reports(request):
     if request.method == 'GET':
         reports = WeekReport.objects.all().values('id', 'week', 'date', 'hours', 'activities', 'score', 'learnings')
         return JsonResponse(list(reports), safe=False)
+
+
+def coordinator_login_view(request):
+    if request.user.is_authenticated:
+        return redirect('coordinator_dashboard')
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+        # You can add extra checks here for coordinator group/role
+        if user is not None:
+            login(request, user)
+            return redirect('coordinator_dashboard')  # Redirect to the dashboard
+        else:
+            messages.error(request, 'Invalid username or password.')
+    return render(request, 'analyzer_app/coordinator_login.html')
+
+def chairman_login_view(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+        # You can add extra checks here for chairman group/role
+        if user is not None:
+            login(request, user)
+            return redirect('dashboard')  # Change to chairman dashboard if you have one
+        else:
+            messages.error(request, 'Invalid username or password.')
+    return render(request, 'analyzer_app/chairman_login.html')
+
+def coordinator_register_view(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        if User.objects.filter(username=username).exists():
+            messages.error(request, 'Username already exists.')
+        else:
+            User.objects.create_user(username=username, password=password)
+            messages.success(request, 'Account created successfully. You can now log in.')
+            return redirect('coordinator_login')
+    return render(request, 'analyzer_app/coordinator_register.html')
+
+@login_required(login_url='coordinator_login')
+def coordinator_dashboard_view(request):
+    return render(request, 'analyzer_app/coordinator_dashboard.html')

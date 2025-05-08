@@ -9,6 +9,42 @@ body {
     height: 100vh; /* Full viewport height */
     overflow: hidden; /* Prevent scrolling outside the body */
 }
+body {
+    background: linear-gradient(135deg, #e9eafc 0%, #f7f7fa 100%);
+    min-height: 100vh;
+}
+.card {
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    border: none;
+}
+.card-header {
+    background: #6072E5;
+    color: #fff;
+    border-radius: 16px 16px 0 0;
+    border: none;
+}
+.login-alt-btn {
+    display: block;
+    width: 100%;
+    padding: 12px 0;
+    background-color: #6072E5;
+    color: #fff;
+    text-align: center;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 1em;
+    transition: background 0.2s;
+    border: none;
+}
+.login-alt-btn:hover {
+    background-color: #4b00b3;
+    color: #fff;
+}
+.card-footer {
+    background: transparent;
+    border-top: none;
+}
 
 .container {
     width: 100%;
@@ -346,6 +382,22 @@ h1 {
     max-height: none;
     height: auto;
     overflow-y: auto;
+}
+
+.login-alt-btn {
+    display: block;
+    width: 100%;
+    padding: 12px 0;
+    background-color: #6072E5;
+    color: #fff;
+    text-align: center;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 1em;
+    transition: background 0.2s;
+}
+.login-alt-btn:hover {
+    background-color: #4b00b3;
 }
 
 @media (max-width: 768px) {

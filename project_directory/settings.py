@@ -123,6 +123,8 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+LOGOUT_REDIRECT_URL = '/coordinator/login/'
+
 STATICFILES_DIRS = [
     BASE_DIR / 'project_app' / 'static',
 ]
