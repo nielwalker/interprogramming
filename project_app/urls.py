@@ -25,4 +25,8 @@ urlpatterns = [
     path('coordinator/register/', views.coordinator_register_view, name='coordinator_register'),
     path('coordinator/dashboard/', views.coordinator_dashboard_view, name='coordinator_dashboard'),
     path('coordinator/logout/', LogoutView.as_view(next_page='coordinator_login'), name='coordinator_logout'),
+    path('coordinator/student-reports/', views.student_reports_view, name='student_reports'),
+    path('chairman/register/', views.chairman_register_view, name='chairman_register'),
+    path('chairman/dashboard/', views.chairman_dashboard_view, name='chairman_dashboard'),
+    path('chairman/logout/', views.chairman_logout_view, name='chairman_logout'),
 ]

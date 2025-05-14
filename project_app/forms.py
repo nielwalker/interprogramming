@@ -4,7 +4,7 @@ from .models import Intern, Portfolio, WeeklyReport, WeekReport
 class InternForm(forms.ModelForm):
     class Meta:
         model = Intern
-        fields = ['name', 'course']
+        fields = ['username', 'password', 'first_name', 'last_name', 'section']
 
 class PortfolioForm(forms.ModelForm):
     class Meta:
@@ -15,7 +15,7 @@ class PortfolioForm(forms.ModelForm):
 class UploadReportForm(forms.ModelForm):
     class Meta:
         model = WeeklyReport
-        fields = ['report_file', 'date_and_hours', 'activities_tasks', 'score_accomplished_targets', 'new_learnings']
+        fields = ['intern', 'week', 'date', 'hours', 'activities', 'score', 'learnings']
 
     def __init__(self, *args, **kwargs):
         self.week_number = kwargs.pop('week_number', None)

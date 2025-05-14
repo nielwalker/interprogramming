@@ -4,12 +4,13 @@ from nltk.corpus import stopwords
 from heapq import nlargest
 import nltk
 from django.db import models
-from django.shortcuts import render, get_object_or_404 , redirect
-from .models import Portfolio, Rating , Intern ,WeeklyReport# Imweeport the Rating model from models.py
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Portfolio, Rating, Intern, WeeklyReport, Coordinator, Chairman  # Import the necessary models
 import json
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from django.contrib.auth import logout
+from django.contrib.auth.hashers import make_password, check_password
 from django.shortcuts import redirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
@@ -96,11 +97,8 @@ def analyze_portfolio(portfolio):
 
 
 def intern_logout_view(request):
-    """
-    Logs out the user and redirects to the login page.
-    """
-    logout(request)  # Logs out the current user
-    return redirect('intern_login')  # Redirect to the login page
+    request.session.flush()
+    return redirect('intern_login')
 
 def portfolio_analysis_view(request, portfolio_id):
     portfolio = get_object_or_404(Portfolio, id=portfolio_id)
@@ -126,14 +124,19 @@ def portfolio_list_view(request):
 
 
 def intern_login_view(request):
+    if request.session.get('intern_id'):
+        return redirect('intern_dashboard')
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-            return redirect('student_dashboard')  # Redirect to the portfolio list or dashboard
-        else:
+        try:
+            intern = Intern.objects.get(username=username)
+            if check_password(password, intern.password):
+                request.session['intern_id'] = intern.id
+                return redirect('intern_dashboard')
+            else:
+                messages.error(request, 'Invalid username or password.')
+        except Intern.DoesNotExist:
             messages.error(request, 'Invalid username or password.')
     return render(request, 'analyzer_app/intern_login.html')
 
@@ -263,17 +266,41 @@ def coordinator_login_view(request):
     return render(request, 'analyzer_app/coordinator_login.html')
 
 def chairman_login_view(request):
+    if request.session.get('chairman_id'):
+        return redirect('chairman_dashboard')
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
-        # You can add extra checks here for chairman group/role
-        if user is not None:
-            login(request, user)
-            return redirect('dashboard')  # Change to chairman dashboard if you have one
-        else:
+        try:
+            chairman = Chairman.objects.get(username=username)
+            if check_password(password, chairman.password):
+                request.session['chairman_id'] = chairman.id
+                return redirect('chairman_dashboard')
+            else:
+                messages.error(request, 'Invalid username or password.')
+        except Chairman.DoesNotExist:
             messages.error(request, 'Invalid username or password.')
     return render(request, 'analyzer_app/chairman_login.html')
+
+def chairman_register_view(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        first_name = request.POST.get('firstname', '')
+        last_name = request.POST.get('lastname', '')
+        # Check if username exists in Chairman table
+        if Chairman.objects.filter(username=username).exists():
+            messages.error(request, 'Username already exists.')
+        else:
+            Chairman.objects.create(
+                username=username,
+                password=make_password(password),
+                first_name=first_name,
+                last_name=last_name
+            )
+            messages.success(request, 'Account created successfully. You can now log in.')
+            return redirect('chairman_login')
+    return render(request, 'analyzer_app/chairman_register.html')
 
 def coordinator_register_view(request):
     if request.method == 'POST':
@@ -287,6 +314,121 @@ def coordinator_register_view(request):
             return redirect('coordinator_login')
     return render(request, 'analyzer_app/coordinator_register.html')
 
-@login_required(login_url='coordinator_login')
 def coordinator_dashboard_view(request):
-    return render(request, 'analyzer_app/coordinator_dashboard.html')
+    coordinator_id = request.session.get('coordinator_id')
+    if not coordinator_id:
+        return redirect('coordinator_login')
+    interns = Intern.objects.all()
+    return render(request, 'analyzer_app/coordinator_dashboard.html', {'interns': interns})
+
+def view_intern_reports(request, intern_id):
+    coordinator_id = request.session.get('coordinator_id')
+    if not coordinator_id:
+        return redirect('coordinator_login')
+    intern = get_object_or_404(Intern, id=intern_id)
+    reports = WeeklyReport.objects.filter(intern=intern)
+    return render(request, 'analyzer_app/view_intern_reports.html', {'intern': intern, 'reports': reports})
+
+@login_required(login_url='coordinator_login')
+def student_reports_view(request):
+    reports = WeekReport.objects.all()
+    return render(request, 'analyzer_app/student_reports.html', {'reports': reports})
+
+# Intern Registration
+def intern_register_view(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = make_password(request.POST['password'])
+        first_name = request.POST['firstname']
+        last_name = request.POST['lastname']
+        section = request.POST['section']
+        if Intern.objects.filter(username=username).exists():
+            messages.error(request, 'Username already exists.')
+        else:
+            Intern.objects.create(
+                username=username,
+                password=password,
+                first_name=first_name,
+                last_name=last_name,
+                section=section
+            )
+            messages.success(request, 'Account created successfully. You can now log in.')
+            return redirect('intern_login')
+    return render(request, 'analyzer_app/intern_register.html')
+
+def intern_dashboard(request):
+    intern_id = request.session.get('intern_id')
+    if not intern_id:
+        return redirect('intern_login')
+    intern = Intern.objects.get(id=intern_id)
+    reports = WeeklyReport.objects.filter(intern=intern)
+    return render(request, 'analyzer_app/intern_dashboard.html', {'intern': intern, 'reports': reports})
+
+def add_weekly_report(request):
+    intern_id = request.session.get('intern_id')
+    if not intern_id:
+        return redirect('intern_login')
+    if request.method == 'POST':
+        week = request.POST['week']
+        date = request.POST['date']
+        hours = request.POST['hours']
+        activities = request.POST['activities']
+        score = request.POST['score']
+        learnings = request.POST['learnings']
+        WeeklyReport.objects.create(
+            intern_id=intern_id,
+            week=week,
+            date=date,
+            hours=hours,
+            activities=activities,
+            score=score,
+            learnings=learnings
+        )
+        messages.success(request, 'Report added!')
+        return redirect('intern_dashboard')
+    return render(request, 'analyzer_app/add_weekly_report.html')
+
+def edit_weekly_report(request, report_id):
+    intern_id = request.session.get('intern_id')
+    report = get_object_or_404(WeeklyReport, id=report_id, intern_id=intern_id)
+    if request.method == 'POST':
+        report.week = request.POST['week']
+        report.date = request.POST['date']
+        report.hours = request.POST['hours']
+        report.activities = request.POST['activities']
+        report.score = request.POST['score']
+        report.learnings = request.POST['learnings']
+        report.save()
+        messages.success(request, 'Report updated!')
+        return redirect('intern_dashboard')
+    return render(request, 'analyzer_app/edit_weekly_report.html', {'report': report})
+
+def delete_weekly_report(request, report_id):
+    intern_id = request.session.get('intern_id')
+    report = get_object_or_404(WeeklyReport, id=report_id, intern_id=intern_id)
+    report.delete()
+    messages.success(request, 'Report deleted!')
+    return redirect('intern_dashboard')
+
+def chairman_dashboard_view(request):
+    chairman_id = request.session.get('chairman_id')
+    if not chairman_id:
+        return redirect('chairman_login')
+    chairman = Chairman.objects.get(id=chairman_id)
+    assessments = CoordinatorAssessment.objects.all()
+    return render(request, 'analyzer_app/chairman_dashboard.html', {
+        'chairman': chairman,
+        'assessments': assessments
+    })
+
+def view_coordinator_assessments(request, coordinator_id):
+    chairman_id = request.session.get('chairman_id')
+    if not chairman_id:
+        return redirect('chairman_login')
+    coordinator = get_object_or_404(Coordinator, id=coordinator_id)
+    assessments = CoordinatorAssessment.objects.filter(coordinator=coordinator)
+    return render(request, 'analyzer_app/view_coordinator_assessments.html', {'coordinator': coordinator, 'assessments': assessments})
+
+def chairman_logout_view(request):
+    request.session.flush()
+    return redirect('chairman_login')

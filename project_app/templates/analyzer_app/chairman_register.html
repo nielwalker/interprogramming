@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Chairman Log In</title>
+    <title>Chairman Registration</title>
     <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
@@ -13,18 +13,26 @@
             <div class="col-md-6 col-lg-5">
                 <div class="card shadow-sm">
                     <div class="card-header text-center py-3">
-                        <h2 class="mb-0">Chairman Login</h2>
+                        <h2 class="mb-0">Chairman Registration</h2>
                     </div>
                     <div class="card-body">
                         {% if messages %}
-                            <div class="alert alert-danger">
-                                {% for message in messages %}
+                            {% for message in messages %}
+                                <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}">
                                     <p class="mb-0">{{ message }}</p>
-                                {% endfor %}
-                            </div>
+                                </div>
+                            {% endfor %}
                         {% endif %}
                         <form method="post" action="">
                             {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="firstname" class="form-label">First Name</label>
+                                <input type="text" id="firstname" name="firstname" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="lastname" class="form-label">Last Name</label>
+                                <input type="text" id="lastname" name="lastname" class="form-control" required>
+                            </div>
                             <div class="mb-3">
                                 <label for="username" class="form-label">Username</label>
                                 <input type="text" id="username" name="username" class="form-control" required autofocus>
@@ -33,12 +41,10 @@
                                 <label for="password" class="form-label">Password</label>
                                 <input type="password" id="password" name="password" class="form-control" required>
                             </div>
-                            <button type="submit" class="btn btn-primary w-100 mb-2">Log In</button>
+                            <button type="submit" class="btn btn-success w-100 mb-2">Create Account</button>
                         </form>
                         <div class="d-flex flex-column gap-2 mt-3">
-                            <a href="{% url 'chairman_register' %}" class="login-alt-btn btn-success" style="background:#28a745;">Create Account</a>
-                            <a href="{% url 'intern_login' %}" class="login-alt-btn">Back to Student Log In</a>
-                            
+                            <a href="{% url 'chairman_login' %}" class="login-alt-btn">Back to Chairman Log In</a>
                         </div>
                     </div>
                 </div>
