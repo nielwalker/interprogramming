@@ -5,7 +5,7 @@ from heapq import nlargest
 import nltk
 from django.db import models
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Portfolio, Rating, Intern, WeeklyReport, Coordinator, Chairman  # Import the necessary models
+from .models import Portfolio, Rating, Intern, WeeklyReport, Coordinator, Chairman  ,CoordinatorAssessment# Import the necessary models
 import json
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
